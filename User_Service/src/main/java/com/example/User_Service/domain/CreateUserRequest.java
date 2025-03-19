@@ -1,22 +1,31 @@
 package com.example.User_Service.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
-    private long id;
+@Builder
+public class CreateUserRequest {
+    @NotBlank
     private String name;
+
+    @NotBlank
     private String username;
+
+    @NotBlank
     private String email;
-    private String address;
-    private String city;
-    @JsonIgnore
+
+    @NotBlank
     private String password;
+
+    @NotBlank
+    private String address;
+
+    @NotBlank
+    private String city;
 }

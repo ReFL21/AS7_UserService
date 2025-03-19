@@ -14,31 +14,36 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "users")
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "user_id")
     private Long id;
 
     @NotBlank
     @Length( max = 50)
-    @Column(name = "name")
+    @Column(name = "Name")
     private String name;
 
     @NotBlank
     @Length( max = 50)
-    @Column(name = "username")
+    @Column(name = "Username")
     private String username;
 
     @NotBlank
-    @Column(name = "email")
+    @Column(name = "Email")
     private String email;
 
     @NotBlank
-    @Column(name = "address")
-    private String dddress;
+    @Column(name = "Address")
+    private String address;
 
-    @Column(name = "password")
+    @NotBlank
+    @Column(name = "City")
+    private String city;
+
+    @Column(name = "Password")
     @Length(max = 150)
     private String password;
 

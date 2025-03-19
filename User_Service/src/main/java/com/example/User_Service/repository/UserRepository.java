@@ -1,4 +1,10 @@
 package com.example.User_Service.repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository {
+import java.util.List;
+
+@Repository
+public interface UserRepository extends JpaRepository <UserEntity, Long> {
+  // List<UserEntity> findall();
 }
