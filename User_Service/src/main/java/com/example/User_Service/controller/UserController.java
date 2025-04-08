@@ -15,7 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-
+@CrossOrigin(origins = {"http://localhost:8083"})
+@RequestMapping("/users")
 @RestController
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,8 +39,10 @@ public class UserController {
 //    @IsAuthenticated
 //    @RolesAllowed({"Admin"})
     @GetMapping
+
     public ResponseEntity<GetAllUsersResponse> getAllUsers() {
         GetAllUsersResponse response = iGetAllUsers.getAllUsers();
+
         return ResponseEntity.ok(response);
     }
 //    @IsAuthenticated

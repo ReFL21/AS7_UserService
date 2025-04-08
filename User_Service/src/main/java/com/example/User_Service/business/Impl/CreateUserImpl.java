@@ -9,7 +9,8 @@ import com.example.User_Service.repository.UserRepository;
 import com.example.User_Service.repository.UserRoleEntity;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -17,7 +18,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class CreateUserImpl implements ICreateUser {
     private final UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+//    private PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -31,12 +32,12 @@ public class CreateUserImpl implements ICreateUser {
     }
 
     private UserEntity saveNewUser(CreateUserRequest userRequest){
-        String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
+//        String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
         UserEntity user = UserEntity.builder()
                 .username(userRequest.getUsername())
                 .email(userRequest.getEmail())
                 .name(userRequest.getName())
-                .password(encodedPassword)
+//                .password(encodedPassword)
                 .build();
 
 

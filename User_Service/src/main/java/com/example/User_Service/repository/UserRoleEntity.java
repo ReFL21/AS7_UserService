@@ -13,7 +13,7 @@ import lombok.*;
 public class UserRoleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idUser_Role")
+    @Column(name = "id_user_role")
     private Long id;
 
     @NotNull
@@ -22,7 +22,7 @@ public class UserRoleEntity {
     private Role role;
 
     @ManyToOne
-    @JoinColumn(name = "User_id")
+    @JoinColumn(name = "User_id")  // Ensure this matches the actual column name in the user_role table
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private UserEntity user;
