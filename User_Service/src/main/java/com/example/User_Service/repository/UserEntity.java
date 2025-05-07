@@ -47,6 +47,7 @@ public class UserEntity {
     @Length(max = 150)
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<UserRoleEntity> userRoles;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "User_Role", nullable = false)
+    private UserRoleEntity userRoles;
 }
