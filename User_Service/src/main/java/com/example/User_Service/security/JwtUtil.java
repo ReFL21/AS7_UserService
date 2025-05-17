@@ -1,38 +1,62 @@
 package com.example.User_Service.security;
 
-import io.jsonwebtoken.Jwts;
-import org.springframework.stereotype.Component;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import java.util.Date;
+
 @Component
 public class JwtUtil {
+
     @Value("${jwt.secret}")
-    private String secret;
+    private String base64Secret;
+
     @Value("${jwt.expiration-ms}")
     private long expirationMs;
-    public String generateToken(String username) {
+
+    private SecretKey signingKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(base64Secret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String generateToken(String username, Long userId, String role) {
+        long now = System.currentTimeMillis();
         return Jwts.builder()
                 .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .claim("id", userId)
+                .claim("role", role)   // ← embed the ID
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + expirationMs))
+                .signWith(signingKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
+
     public String extractUsername(String token) {
-        return Jwts.parser().setSigningKey(secret)
-                .parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parserBuilder()
+                .setSigningKey(signingKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
-    public boolean validateToken(String token, org.springframework.security.core.userdetails.UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public boolean validateToken(String token,
+                                 org.springframework.security.core.userdetails.UserDetails userDetails) {
+        String user = extractUsername(token);
+        return user.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
-        Date exp = Jwts.parser().setSigningKey(secret)
-                .parseClaimsJws(token).getBody().getExpiration();
+        Date exp = Jwts.parserBuilder()
+                .setSigningKey(signingKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
         return exp.before(new Date());
     }
 
