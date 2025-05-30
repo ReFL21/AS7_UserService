@@ -46,8 +46,11 @@ public class JwtUtil {
 
     public boolean validateToken(String token,
                                  org.springframework.security.core.userdetails.UserDetails userDetails) {
-        String user = extractUsername(token);
-        return user.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        try{
+            String user = extractUsername(token);
+            return user.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        }catch(Exception e){return false;}
+
     }
 
     private boolean isTokenExpired(String token) {
