@@ -23,6 +23,7 @@ services:
     environment:
       # Use the MySQL container's service name and internal port.
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_users:3306/userdatabase
+#      SPRING_DATASOURCE_URL: nababatiguza
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: qwerty
     depends_on:
