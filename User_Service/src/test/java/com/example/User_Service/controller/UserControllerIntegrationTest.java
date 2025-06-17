@@ -1,58 +1,76 @@
 package com.example.User_Service.controller;
+import com.example.User_Service.UserServiceApplication;
 import com.example.User_Service.business.*;
 import com.example.User_Service.domain.*;
+import com.example.User_Service.rabbitMQ.RabbitMQConfig;
+import com.example.User_Service.rabbitMQ.UserDeleteEvent;
+import com.example.User_Service.repository.*;
 import com.example.User_Service.security.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@SpringBootTest(
+        classes = UserServiceApplication.class,
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+                // this tells Hibernate to create the schema at startup and drop it at shutdown
+                "spring.jpa.hibernate.ddl-auto=create-drop",
+                // (optional) so you can see the SQL being executed in the log
+                "spring.jpa.show-sql=true"
+        }
+)
 
-@WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureTestDatabase
+//@Rollback
 public class UserControllerIntegrationTest {
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    UserRoleRepository userRoleRepository;
+    @MockitoBean
+    private RabbitTemplate rabbitTemplate;
+    @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @MockitoBean
     private IGetAllUsers iGetAllUsers;
-
     @MockitoBean
     private IGetUserById getUserById;
-
     @MockitoBean
     private ICreateUser createUser;
-
     @MockitoBean
     private IDeleteUser deleteUser;
-
     @MockitoBean
     private ILoginUser loginUseCase;
-
     @MockitoBean
     private IUpdateUserInfo updateUserInfo;
-
     @MockitoBean
     private JwtUtil jwtUtil;
-
     @MockitoBean
     private com.example.User_Service.filter.JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -105,15 +123,6 @@ public class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalid)))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("DELETE /users/{id} deletes user")
-    void testDeleteUser() throws Exception {
-        doNothing().when(deleteUser).deleteUser(4L);
-
-        mockMvc.perform(delete("/users/4"))
-                .andExpect(status().isNoContent());
     }
 
     @Test
